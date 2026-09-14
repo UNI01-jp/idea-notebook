@@ -1,0 +1,980 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>アイデア帳</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+  :root {
+    --bg: #EDEFF2;
+    --surface: #FFFFFF;
+    --surface-alt: #F4F6F8;
+    --ink: #23262B;
+    --ink-muted: #6B7280;
+    --ink-faint: #9BA1AA;
+    --border: #DBDFE4;
+    --accent: #2F5D5A;
+    --accent-ink: #FFFFFF;
+    --accent-soft: #DCE8E6;
+    --danger: #B3432B;
+    --shadow: 0 1px 2px rgba(35, 38, 43, 0.04), 0 8px 24px -12px rgba(35, 38, 43, 0.14);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1B1E22;
+      --surface: #23262B;
+      --surface-alt: #2A2E33;
+      --ink: #E7E9EC;
+      --ink-muted: #9AA1AB;
+      --ink-faint: #6B7280;
+      --border: #35393F;
+      --accent: #86BFB9;
+      --accent-ink: #10201E;
+      --accent-soft: #253937;
+      --danger: #E08767;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #1B1E22;
+    --surface: #23262B;
+    --surface-alt: #2A2E33;
+    --ink: #E7E9EC;
+    --ink-muted: #9AA1AB;
+    --ink-faint: #6B7280;
+    --border: #35393F;
+    --accent: #86BFB9;
+    --accent-ink: #10201E;
+    --accent-soft: #253937;
+    --danger: #E08767;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Zen Kaku Gothic New', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .entry { animation: settle 0.25s ease-out; }
+  }
+  @keyframes settle {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  [hidden] { display: none !important; }
+
+  #app {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 48px 20px 96px;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .page-header {
+    margin-bottom: 28px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .page-header-main { flex: 1 1 auto; min-width: 0; }
+
+  .eyebrow {
+    margin: 0 0 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .page-title {
+    margin: 0 0 8px;
+    font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+    font-weight: 800;
+    font-size: clamp(1.9rem, 5vw, 2.4rem);
+    letter-spacing: 0.02em;
+    text-wrap: balance;
+  }
+
+  .page-subtitle {
+    margin: 0;
+    color: var(--ink-muted);
+    font-size: 0.95rem;
+  }
+
+  .signout-btn {
+    flex: 0 0 auto;
+    appearance: none;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink-muted);
+    font: inherit;
+    font-size: 0.78rem;
+    padding: 7px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .signout-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .composer {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+    margin-bottom: 14px;
+  }
+
+  .composer-input {
+    width: 100%;
+    resize: vertical;
+    min-height: 72px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    font-size: 1rem;
+    padding: 4px 2px 10px;
+  }
+  .composer-input::placeholder { color: var(--ink-faint); }
+  .composer-input:disabled { color: var(--ink-faint); }
+
+  .composer-tags-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 2px 10px;
+  }
+
+  .composer-tags-label {
+    flex: 0 0 auto;
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+  }
+
+  .composer-tags-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface-alt);
+    color: var(--ink);
+    font: inherit;
+    font-size: 0.85rem;
+    padding: 7px 10px;
+  }
+  .composer-tags-input::placeholder { color: var(--ink-faint); }
+  .composer-tags-input:disabled { color: var(--ink-faint); }
+
+  .composer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  .composer-hint {
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+  }
+
+  .composer-submit {
+    appearance: none;
+    border: none;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font: inherit;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 9px 20px;
+    cursor: pointer;
+    transition: opacity 0.15s ease, transform 0.05s ease;
+  }
+  .composer-submit:hover { opacity: 0.9; }
+  .composer-submit:active { transform: scale(0.98); }
+  .composer-submit:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .composer-submit:focus-visible,
+  .composer-input:focus-visible,
+  .composer-tags-input:focus-visible,
+  .entry-delete:focus-visible,
+  .entry-edit-btn:focus-visible,
+  .entry-save:focus-visible,
+  .entry-cancel:focus-visible,
+  .entry-edit-text:focus-visible,
+  .entry-edit-tags:focus-visible,
+  .entry-tag:focus-visible,
+  .tag-chip:focus-visible,
+  .auth-input:focus-visible,
+  .signout-btn:focus-visible,
+  .auth-switch:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .status-banner {
+    font-size: 0.85rem;
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+    background: var(--accent-soft);
+    color: var(--ink);
+    border: 1px solid var(--border);
+  }
+  .status-banner[data-tone="warn"] {
+    background: color-mix(in srgb, var(--danger) 14%, var(--surface));
+  }
+
+  .tag-filter-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 2px 2px 14px;
+  }
+
+  .tag-chip {
+    appearance: none;
+    flex: 0 0 auto;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink-muted);
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .tag-chip .tag-count {
+    margin-left: 4px;
+    opacity: 0.6;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .tag-chip.is-active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+  .tag-chip.is-active .tag-count { opacity: 0.85; }
+
+  .empty-state {
+    color: var(--ink-faint);
+    font-size: 0.92rem;
+    padding: 32px 4px;
+    text-align: center;
+  }
+
+  .day-group + .day-group { margin-top: 22px; }
+
+  .day-label {
+    margin: 0 0 10px 2px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--ink-muted);
+    letter-spacing: 0.02em;
+  }
+
+  .entries {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .entry {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "time text actions"
+      ".    tags   .";
+    column-gap: 12px;
+    row-gap: 6px;
+    align-items: start;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 12px 12px 14px;
+  }
+
+  .entry.entry-editing {
+    display: block;
+  }
+
+  .entry-time {
+    grid-area: time;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+    padding-top: 3px;
+  }
+
+  .entry-text {
+    grid-area: text;
+    margin: 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-size: 0.98rem;
+  }
+
+  .entry-actions {
+    grid-area: actions;
+    display: flex;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .entry-delete,
+  .entry-edit-btn {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: var(--ink-faint);
+    font-size: 1rem;
+    line-height: 1;
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .entry-delete:hover { color: var(--danger); background: var(--surface-alt); }
+  .entry-edit-btn:hover { color: var(--accent); background: var(--surface-alt); }
+
+  .entry-tags {
+    grid-area: tags;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .entry-edit-head {
+    margin-bottom: 8px;
+  }
+
+  .entry-edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .entry-edit-text {
+    width: 100%;
+    resize: vertical;
+    min-height: 64px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface-alt);
+    color: var(--ink);
+    font: inherit;
+    font-size: 0.95rem;
+    padding: 8px 10px;
+  }
+
+  .entry-edit-tags {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface-alt);
+    color: var(--ink);
+    font: inherit;
+    font-size: 0.85rem;
+    padding: 6px 10px;
+  }
+
+  .entry-edit-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .entry-save {
+    appearance: none;
+    border: none;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font: inherit;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 7px 16px;
+    cursor: pointer;
+  }
+  .entry-save:hover { opacity: 0.9; }
+
+  .entry-cancel {
+    appearance: none;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ink-muted);
+    font: inherit;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 7px 16px;
+    cursor: pointer;
+  }
+  .entry-cancel:hover { border-color: var(--accent); color: var(--accent); }
+
+  .entry-tag {
+    appearance: none;
+    border: 1px solid var(--border);
+    background: var(--surface-alt);
+    color: var(--ink-muted);
+    font: inherit;
+    font-size: 0.72rem;
+    padding: 2px 10px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .entry-tag:hover { border-color: var(--accent); color: var(--accent); }
+
+  footer.page-footer {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+  }
+
+  /* --- ログイン画面 --- */
+  .auth-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 380px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 24px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .auth-input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface-alt);
+    color: var(--ink);
+    font: inherit;
+    font-size: 0.95rem;
+    padding: 10px 12px;
+  }
+  .auth-input::placeholder { color: var(--ink-faint); }
+
+  .auth-submit {
+    margin-top: 4px;
+    width: 100%;
+  }
+
+  .auth-switch {
+    margin-top: 14px;
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: var(--ink-muted);
+    font: inherit;
+    font-size: 0.82rem;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 4px;
+  }
+  .auth-switch:hover { color: var(--accent); }
+
+  .auth-status {
+    margin-top: 12px;
+    font-size: 0.85rem;
+    text-align: left;
+  }
+</style>
+</head>
+<body>
+
+<div id="auth-screen" class="auth-screen">
+  <div class="auth-card">
+    <p class="eyebrow">Memo Pad</p>
+    <h1 class="page-title" style="font-size:1.7rem;">アイデア帳</h1>
+    <p class="page-subtitle" id="auth-intro">メールアドレスとパスワードでログインしてください</p>
+    <form id="auth-form" class="auth-form" autocomplete="on">
+      <label class="visually-hidden" for="auth-email">メールアドレス</label>
+      <input id="auth-email" class="auth-input" type="email" placeholder="メールアドレス" autocomplete="email" required>
+      <label class="visually-hidden" for="auth-password">パスワード</label>
+      <input id="auth-password" class="auth-input" type="password" placeholder="パスワード(6文字以上)" autocomplete="current-password" minlength="6" required>
+      <button id="auth-submit" type="submit" class="composer-submit auth-submit">ログイン</button>
+    </form>
+    <button id="auth-switch" type="button" class="auth-switch">アカウントをお持ちでない方はこちら(新規登録)</button>
+    <p id="auth-status" class="status-banner auth-status" hidden></p>
+  </div>
+</div>
+
+<div id="app" hidden>
+  <header class="page-header">
+    <div class="page-header-main">
+      <p class="eyebrow">Memo Pad</p>
+      <h1 class="page-title">アイデア帳</h1>
+      <p class="page-subtitle">思いついた瞬間に、そのまま書き留める場所。タグで自由に整理して、あとから絞り込めます。</p>
+    </div>
+    <button id="signout-btn" type="button" class="signout-btn">ログアウト</button>
+  </header>
+
+  <form id="composer-form" class="composer" autocomplete="off">
+    <label for="composer-input" class="visually-hidden">新しいメモ</label>
+    <textarea id="composer-input" class="composer-input" rows="3" placeholder="ふと思いついたことを書く…"></textarea>
+    <div class="composer-tags-row">
+      <label for="composer-tags" class="composer-tags-label">タグ</label>
+      <input id="composer-tags" class="composer-tags-input" type="text" placeholder="空白区切りで自由に(例: コンテンツ トレード)。空欄でもOK">
+    </div>
+    <div class="composer-row">
+      <span class="composer-hint">⌘ / Ctrl + Enter でも書き留められます</span>
+      <button id="composer-submit" type="submit" class="composer-submit">書き留める</button>
+    </div>
+  </form>
+
+  <div id="status-banner" class="status-banner" hidden></div>
+
+  <main class="notebook">
+    <div id="tag-filter-bar" class="tag-filter-bar" hidden></div>
+    <p id="empty-state" class="empty-state">まだメモがありません。最初のひらめきを書いてみましょう。</p>
+    <div id="note-list" class="note-list"></div>
+  </main>
+
+  <footer class="page-footer">書いた内容はSupabaseに自動で保存されます。</footer>
+</div>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+  // --- Supabase接続情報(idea-notebookプロジェクト専用) ---
+  const SUPABASE_URL = 'https://ktwyrzaypksydfoexkoo.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_o2_xxjcty1bNM1l6w_ko8w_c0J2Ec3L';
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // --- 要素の取得 ---
+  var authScreenEl = document.getElementById('auth-screen');
+  var appEl = document.getElementById('app');
+  var authFormEl = document.getElementById('auth-form');
+  var authEmailEl = document.getElementById('auth-email');
+  var authPasswordEl = document.getElementById('auth-password');
+  var authSubmitEl = document.getElementById('auth-submit');
+  var authSwitchEl = document.getElementById('auth-switch');
+  var authStatusEl = document.getElementById('auth-status');
+  var authIntroEl = document.getElementById('auth-intro');
+  var signoutBtnEl = document.getElementById('signout-btn');
+
+  var listEl = document.getElementById('note-list');
+  var emptyEl = document.getElementById('empty-state');
+  var filterBarEl = document.getElementById('tag-filter-bar');
+  var formEl = document.getElementById('composer-form');
+  var textareaEl = document.getElementById('composer-input');
+  var tagsInputEl = document.getElementById('composer-tags');
+  var statusEl = document.getElementById('status-banner');
+  var submitBtn = document.getElementById('composer-submit');
+
+  var notes = [];
+  var activeTag = null;
+  var editingId = null;
+  var currentUser = null;
+  var authMode = 'login'; // 'login' or 'signup'
+  var saving = false;
+  var queuedSave = false;
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function parseTags(raw) {
+    var seen = {};
+    var out = [];
+    String(raw || '').split(/[\s,、]+/u).forEach(function (t) {
+      var tag = t.trim();
+      if (tag && !seen[tag]) { seen[tag] = true; out.push(tag); }
+    });
+    return out;
+  }
+
+  function collectTagCounts(list) {
+    var counts = {};
+    var order = [];
+    list.forEach(function (n) {
+      (n.tags || []).forEach(function (t) {
+        if (!(t in counts)) { counts[t] = 0; order.push(t); }
+        counts[t]++;
+      });
+    });
+    return order.map(function (t) { return { tag: t, count: counts[t] }; })
+      .sort(function (a, b) { return b.count - a.count || a.tag.localeCompare(b.tag, 'ja'); });
+  }
+
+  var WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
+
+  function formatDateLabel(iso) {
+    var d = new Date(iso);
+    var now = new Date();
+    var label = d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日(' + WEEKDAYS[d.getDay()] + ')';
+    return (d.toDateString() === now.toDateString()) ? '今日・' + label : label;
+  }
+
+  function formatTime(iso) {
+    var d = new Date(iso);
+    var h = String(d.getHours()).padStart(2, '0');
+    var m = String(d.getMinutes()).padStart(2, '0');
+    return h + ':' + m;
+  }
+
+  function renderEntryView(n) {
+    var tagsHtml = (n.tags && n.tags.length)
+      ? '<div class="entry-tags">' + n.tags.map(function (t) {
+          return '<button type="button" class="entry-tag" data-tag="' + escapeHtml(t) + '">' + escapeHtml(t) + '</button>';
+        }).join('') + '</div>'
+      : '';
+    var timeLabel = formatTime(n.createdAt) + (n.updatedAt ? '(編集 ' + formatTime(n.updatedAt) + ')' : '');
+    return '<li class="entry" data-id="' + n.id + '">' +
+      '<span class="entry-time">' + timeLabel + '</span>' +
+      '<p class="entry-text">' + escapeHtml(n.text) + '</p>' +
+      '<div class="entry-actions">' +
+        '<button class="entry-edit-btn" type="button" data-id="' + n.id + '" aria-label="このメモを編集">✎</button>' +
+        '<button class="entry-delete" type="button" data-id="' + n.id + '" aria-label="このメモを削除">×</button>' +
+      '</div>' +
+      tagsHtml +
+      '</li>';
+  }
+
+  function renderEditForm(n) {
+    var tagsValue = (n.tags || []).join(' ');
+    return '<li class="entry entry-editing" data-id="' + n.id + '">' +
+      '<div class="entry-edit-head"><span class="entry-time">' + formatTime(n.createdAt) + '</span></div>' +
+      '<div class="entry-edit-form">' +
+        '<textarea class="entry-edit-text" rows="3">' + escapeHtml(n.text) + '</textarea>' +
+        '<input type="text" class="entry-edit-tags" value="' + escapeHtml(tagsValue) + '" placeholder="タグ(空白区切り)">' +
+        '<div class="entry-edit-actions">' +
+          '<button type="button" class="entry-cancel" data-id="' + n.id + '">キャンセル</button>' +
+          '<button type="button" class="entry-save" data-id="' + n.id + '">保存</button>' +
+        '</div>' +
+      '</div>' +
+      '</li>';
+  }
+
+  function groupByDate(list) {
+    var groups = [];
+    var currentKey = null, currentGroup = null;
+    for (var i = 0; i < list.length; i++) {
+      var n = list[i];
+      var key = new Date(n.createdAt).toDateString();
+      if (key !== currentKey) {
+        currentGroup = { label: formatDateLabel(n.createdAt), items: [] };
+        groups.push(currentGroup);
+        currentKey = key;
+      }
+      currentGroup.items.push(n);
+    }
+    return groups;
+  }
+
+  function renderFilterBar() {
+    var tagCounts = collectTagCounts(notes);
+    if (!tagCounts.length) {
+      filterBarEl.hidden = true;
+      filterBarEl.innerHTML = '';
+      return;
+    }
+    filterBarEl.hidden = false;
+    var allChip = '<button type="button" class="tag-chip' + (activeTag === null ? ' is-active' : '') + '" data-tag="">すべて</button>';
+    var chips = tagCounts.map(function (tc) {
+      var active = (activeTag === tc.tag) ? ' is-active' : '';
+      return '<button type="button" class="tag-chip' + active + '" data-tag="' + escapeHtml(tc.tag) + '">' +
+        escapeHtml(tc.tag) + '<span class="tag-count">' + tc.count + '</span></button>';
+    }).join('');
+    filterBarEl.innerHTML = allChip + chips;
+  }
+
+  function render() {
+    renderFilterBar();
+
+    var visible = activeTag ? notes.filter(function (n) { return (n.tags || []).indexOf(activeTag) !== -1; }) : notes;
+
+    if (!visible.length) {
+      listEl.innerHTML = '';
+      emptyEl.hidden = false;
+      emptyEl.textContent = activeTag
+        ? '「' + activeTag + '」のタグがついたメモはまだありません。'
+        : 'まだメモがありません。最初のひらめきを書いてみましょう。';
+      return;
+    }
+    emptyEl.hidden = true;
+
+    var groups = groupByDate(visible);
+    listEl.innerHTML = groups.map(function (g) {
+      var items = g.items.map(function (n) {
+        return (n.id === editingId) ? renderEditForm(n) : renderEntryView(n);
+      }).join('');
+      return '<section class="day-group"><h2 class="day-label">' + escapeHtml(g.label) + '</h2>' +
+        '<ul class="entries">' + items + '</ul></section>';
+    }).join('');
+  }
+
+  function setStatus(message, tone) {
+    if (!message) { statusEl.hidden = true; statusEl.textContent = ''; return; }
+    statusEl.hidden = false;
+    statusEl.textContent = message;
+    statusEl.dataset.tone = tone || 'info';
+  }
+
+  function setAuthStatus(message, tone) {
+    if (!message) { authStatusEl.hidden = true; authStatusEl.textContent = ''; return; }
+    authStatusEl.hidden = false;
+    authStatusEl.textContent = message;
+    authStatusEl.dataset.tone = tone || 'info';
+  }
+
+  // --- Supabaseへの保存 ---
+  function persist() {
+    if (!currentUser) return;
+    if (saving) { queuedSave = true; return; }
+    saving = true;
+    supabase.from('app_state').upsert({
+      user_id: currentUser.id,
+      data: { notes: notes },
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'user_id' }).then(function (res) {
+      if (res.error) {
+        setStatus('保存に失敗しました。もう一度お試しください。', 'warn');
+      }
+    }).finally(function () {
+      saving = false;
+      if (queuedSave) { queuedSave = false; persist(); }
+    });
+  }
+
+  function addNote(text, tagsRaw) {
+    var trimmed = text.trim();
+    if (!trimmed) return;
+    var id = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now() + '-' + Math.random().toString(16).slice(2));
+    var tags = parseTags(tagsRaw);
+    notes = [{ id: id, text: trimmed, tags: tags, createdAt: new Date().toISOString() }].concat(notes);
+    render();
+    persist();
+  }
+
+  function deleteNote(id) {
+    notes = notes.filter(function (n) { return n.id !== id; });
+    render();
+    persist();
+  }
+
+  function saveEdit(id, text, tagsRaw) {
+    var trimmed = text.trim();
+    if (!trimmed) {
+      setStatus('本文を空にはできません。', 'warn');
+      return;
+    }
+    var tags = parseTags(tagsRaw);
+    notes = notes.map(function (n) {
+      if (n.id !== id) return n;
+      return { id: n.id, text: trimmed, tags: tags, createdAt: n.createdAt, updatedAt: new Date().toISOString() };
+    });
+    editingId = null;
+    render();
+    persist();
+  }
+
+  formEl.addEventListener('submit', function (e) {
+    e.preventDefault();
+    addNote(textareaEl.value, tagsInputEl.value);
+    textareaEl.value = '';
+    tagsInputEl.value = '';
+    textareaEl.focus();
+  });
+
+  textareaEl.addEventListener('keydown', function (e) {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') formEl.requestSubmit();
+  });
+
+  listEl.addEventListener('click', function (e) {
+    var delBtn = e.target.closest('.entry-delete');
+    if (delBtn) { deleteNote(delBtn.dataset.id); return; }
+    var editBtn = e.target.closest('.entry-edit-btn');
+    if (editBtn) { editingId = editBtn.dataset.id; render(); return; }
+    var cancelBtn = e.target.closest('.entry-cancel');
+    if (cancelBtn) { editingId = null; render(); return; }
+    var saveBtn = e.target.closest('.entry-save');
+    if (saveBtn) {
+      var li = saveBtn.closest('.entry-editing');
+      var textEl = li.querySelector('.entry-edit-text');
+      var tagsEl = li.querySelector('.entry-edit-tags');
+      saveEdit(saveBtn.dataset.id, textEl.value, tagsEl.value);
+      return;
+    }
+    var tagBtn = e.target.closest('.entry-tag');
+    if (tagBtn) { activeTag = tagBtn.dataset.tag; render(); }
+  });
+
+  listEl.addEventListener('keydown', function (e) {
+    if (!((e.metaKey || e.ctrlKey) && e.key === 'Enter')) return;
+    var ta = e.target.closest('.entry-edit-text');
+    if (!ta) return;
+    var li = ta.closest('.entry-editing');
+    var saveBtn = li && li.querySelector('.entry-save');
+    if (saveBtn) saveBtn.click();
+  });
+
+  filterBarEl.addEventListener('click', function (e) {
+    var btn = e.target.closest('.tag-chip');
+    if (!btn) return;
+    activeTag = btn.dataset.tag ? btn.dataset.tag : null;
+    render();
+  });
+
+  // --- 認証まわり ---
+  function showApp() {
+    authScreenEl.hidden = true;
+    appEl.hidden = false;
+  }
+
+  function showAuthScreen() {
+    appEl.hidden = true;
+    authScreenEl.hidden = false;
+  }
+
+  async function loadNotesForUser(user) {
+    var res = await supabase.from('app_state').select('data').eq('user_id', user.id).maybeSingle();
+    if (res.error) {
+      setStatus('データの読み込みに失敗しました。ページを再読み込みしてください。', 'warn');
+      notes = [];
+    } else {
+      notes = (res.data && res.data.data && res.data.data.notes) ? res.data.data.notes : [];
+    }
+    render();
+  }
+
+  async function onAuthed(user) {
+    currentUser = user;
+    showApp();
+    await loadNotesForUser(user);
+  }
+
+  function onSignedOut() {
+    currentUser = null;
+    notes = [];
+    activeTag = null;
+    editingId = null;
+    authEmailEl.value = '';
+    authPasswordEl.value = '';
+    showAuthScreen();
+  }
+
+  authSwitchEl.addEventListener('click', function () {
+    authMode = (authMode === 'login') ? 'signup' : 'login';
+    authSubmitEl.textContent = (authMode === 'login') ? 'ログイン' : '新規登録';
+    authIntroEl.textContent = (authMode === 'login')
+      ? 'メールアドレスとパスワードでログインしてください'
+      : '新しいアカウントを作成します';
+    authSwitchEl.textContent = (authMode === 'login')
+      ? 'アカウントをお持ちでない方はこちら(新規登録)'
+      : 'すでにアカウントをお持ちの方はこちら(ログイン)';
+    setAuthStatus('');
+  });
+
+  authFormEl.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var email = authEmailEl.value.trim();
+    var password = authPasswordEl.value;
+    if (!email || !password) return;
+    authSubmitEl.disabled = true;
+    setAuthStatus('');
+
+    try {
+      if (authMode === 'login') {
+        var res = await supabase.auth.signInWithPassword({ email: email, password: password });
+        if (res.error) {
+          setAuthStatus('ログインできませんでした。メールアドレスとパスワードを確認してください。', 'warn');
+        }
+        // 成功時は onAuthStateChange 側で画面が切り替わる
+      } else {
+        var res2 = await supabase.auth.signUp({ email: email, password: password });
+        if (res2.error) {
+          setAuthStatus('登録に失敗しました:' + res2.error.message, 'warn');
+        } else if (res2.data && res2.data.session) {
+          // メール確認不要な設定の場合はそのままログイン状態になる
+        } else {
+          setAuthStatus('確認メールを送信しました。メール内のリンクを開いてから、ログインしてください。', 'info');
+        }
+      }
+    } finally {
+      authSubmitEl.disabled = false;
+    }
+  });
+
+  signoutBtnEl.addEventListener('click', async function () {
+    await supabase.auth.signOut();
+  });
+
+  supabase.auth.onAuthStateChange(function (event, session) {
+    if (session && session.user) {
+      onAuthed(session.user);
+    } else {
+      onSignedOut();
+    }
+  });
+
+  supabase.auth.getSession().then(function (res) {
+    var session = res.data && res.data.session;
+    if (session && session.user) {
+      onAuthed(session.user);
+    } else {
+      showAuthScreen();
+    }
+  });
+</script>
+</body>
+</html>
